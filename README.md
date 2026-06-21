@@ -2,6 +2,12 @@
 
 面向计算机图形学课程项目的三维网格简化与 LOD 可视化工具。
 
+项目仓库：
+
+```text
+https://github.com/Snowed-night/mesh-lod-tool
+```
+
 LOD 是 Level of Detail，意思是“细节层次”：近处显示高精度模型，远处显示低精度模型，用更少三角面换取更低渲染成本。
 
 ## 当前功能
