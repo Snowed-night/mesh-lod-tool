@@ -1,0 +1,36 @@
+build/
+build-*/
+out/
+.vs/
+.vscode/
+*.user
+*.obj
+*.exe
+*.pdb
+*.ilk
+
+# Dependency caches
+web/node_modules/
+
+# Keep only the meshoptimizer files used by this project
+third_party/meshoptimizer/*
+!third_party/meshoptimizer/LICENSE.md
+!third_party/meshoptimizer/README.md
+!third_party/meshoptimizer/src/
+!third_party/meshoptimizer/src/**
+
+# Generated outputs and large local assets
+result/web/models/
+result/web/uploads/
+result/web/temp/
+result/web/jobs.json
+素材/
+
+# Keep lightweight experiment tables available for reports
+!result/
+!result/web/
+!result/web/tables/
+!result/web/tables/*.csv
+
+# Local UI design cache
+.superdesign/

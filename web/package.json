@@ -1,0 +1,16 @@
+{
+  "name": "mesh-lod-web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "fast-xml-parser": "^5.9.0",
+    "jszip": "^3.10.1",
+    "multer": "^2.0.1",
+    "three": "^0.165.0"
+  }
+}

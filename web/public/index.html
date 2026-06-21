@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mesh LOD Tool</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="sidebar">
+        <div class="brand">
+          <h1>Mesh LOD Tool</h1>
+          <p>OBJ / 3MF 网格简化与多级 LOD 预览</p>
+        </div>
+
+        <form id="uploadForm" class="upload-panel">
+          <label class="file-drop" for="modelFile">
+            <span id="fileName">选择 OBJ 或 3MF 模型</span>
+            <input id="modelFile" name="model" type="file" accept=".obj,.3mf" />
+          </label>
+          <button id="processButton" type="submit">生成 LOD</button>
+        </form>
+
+        <div class="status-panel">
+          <div class="status-row">
+            <span>状态</span>
+            <strong id="statusText">等待上传</strong>
+          </div>
+          <div class="status-row">
+            <span>当前模型</span>
+            <strong id="modelName">-</strong>
+          </div>
+          <div class="status-row">
+            <span>当前 LOD</span>
+            <strong id="lodName">-</strong>
+          </div>
+          <div class="status-row">
+            <span>源 OBJ</span>
+            <strong><a id="convertedObjLink" href="#" download>-</a></strong>
+          </div>
+          <div class="status-row">
+            <span>结果目录</span>
+            <strong id="resultDirText">-</strong>
+          </div>
+        </div>
+
+        <div class="controls">
+          <div class="mode-row">
+            <button id="manualModeButton" class="active" type="button">手动 LOD</button>
+            <button id="adaptiveModeButton" type="button">自适应 LOD</button>
+          </div>
+          <label for="lodSlider">LOD 层级</label>
+          <input id="lodSlider" type="range" min="0" max="0" value="0" disabled />
+          <div class="adaptive-controls">
+            <label for="errorThreshold">屏幕误差阈值 <span id="errorThresholdValue">2.0 px</span></label>
+            <input id="errorThreshold" type="range" min="0.5" max="12" step="0.5" value="2" />
+            <div class="metric-row">
+              <span>估计屏幕误差</span>
+              <strong id="screenErrorText">-</strong>
+            </div>
+            <div class="metric-row">
+              <span>几何误差</span>
+              <strong id="geometryErrorText">-</strong>
+            </div>
+          </div>
+          <div class="button-row">
+            <button id="wireButton" type="button">线框</button>
+            <button id="resetButton" type="button">重置视角</button>
+          </div>
+          <div class="render-mode-row">
+            <button id="pbrModeButton" class="active" type="button">真实材质</button>
+            <button id="heatmapModeButton" type="button">误差热力图</button>
+          </div>
+          <div class="metric-row">
+            <span>热力图指标</span>
+            <strong id="heatmapMetricText">结构敏感度 + 轮廓</strong>
+          </div>
+          <div class="heatmap-controls">
+            <label for="heatmapIntensity">热力图强度 <span id="heatmapIntensityValue">0.65</span></label>
+            <input id="heatmapIntensity" type="range" min="0.2" max="1.4" step="0.05" value="0.65" />
+          </div>
+          <div class="light-controls">
+            <label for="lightMode">光源</label>
+            <select id="lightMode">
+              <option value="sun">自然光</option>
+              <option value="point">点光源</option>
+            </select>
+            <label for="lightX">X</label>
+            <input id="lightX" type="range" min="-4" max="4" step="0.01" value="-1.4" />
+            <label for="lightY">Y</label>
+            <input id="lightY" type="range" min="-4" max="4" step="0.01" value="2.2" />
+            <label for="lightZ">Z</label>
+            <input id="lightZ" type="range" min="-4" max="4" step="0.01" value="2.4" />
+            <label for="lightIntensity">强度</label>
+            <input id="lightIntensity" type="range" min="0" max="30" step="0.1" value="8" />
+            <label for="lightColor">颜色</label>
+            <input id="lightColor" type="color" value="#ffffff" />
+          </div>
+          <p class="hint">左键旋转，Ctrl + 左键拖拽平移，L + 左键放置点光源，滚轮缩放。</p>
+        </div>
+      </section>
+
+      <section class="viewer-panel">
+        <canvas id="viewerCanvas"></canvas>
+      </section>
+
+      <section class="stats-panel">
+        <div class="quality-panel">
+          <div class="quality-chart">
+            <div class="chart-title">误差-复杂度曲线</div>
+            <canvas id="qualityChart" width="560" height="150"></canvas>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>LOD</th>
+                <th>比例</th>
+                <th>顶点</th>
+                <th>三角面</th>
+                <th>压缩率</th>
+                <th>几何误差</th>
+                <th>屏幕误差</th>
+                <th>耗时</th>
+              </tr>
+            </thead>
+            <tbody id="statsBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "/vendor/three/build/three.module.js",
+          "three/addons/": "/vendor/three/examples/jsm/"
+        }
+      }
+    </script>
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>
