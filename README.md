@@ -213,6 +213,7 @@ report/
   03_reflection.md          未来工作展望与个人感想
   ppt_outline.md            答辩 PPT 结构
   提交说明.md               大作业提交材料总入口
+  word/                     正式提交用 Word 文档
 ```
 
 建议最终压缩包命名：
