@@ -5,6 +5,7 @@ import * as THREE from "three";
 import { TrackballControls } from "three/addons/controls/TrackballControls.js";
 import { OBJLoader } from "three/addons/loaders/OBJLoader.js";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+import { mergeVertices } from "three/addons/utils/BufferGeometryUtils.js";
 
 const canvas = document.querySelector("#viewerCanvas");
 const form = document.querySelector("#uploadForm");
@@ -124,6 +125,8 @@ function setupLights() {
   keyLight = new THREE.DirectionalLight(0xffffff, 0.95);
   keyLight.castShadow = true;
   keyLight.shadow.mapSize.set(2048, 2048);
+  keyLight.shadow.bias = -0.00002;
+  keyLight.shadow.normalBias = 0.03;
   scene.add(keyLight);
   scene.add(keyLight.target);
 
@@ -134,6 +137,8 @@ function setupLights() {
   pointLight = new THREE.PointLight(0xffffff, 1.2, 0, 1.4);
   pointLight.castShadow = true;
   pointLight.shadow.mapSize.set(1024, 1024);
+  pointLight.shadow.bias = -0.00002;
+  pointLight.shadow.normalBias = 0.03;
   scene.add(pointLight);
 
   pointLightMarker = new THREE.Mesh(
@@ -205,6 +210,7 @@ function updateLighting() {
   keyLight.shadow.camera.top = modelRadius * 4;
   keyLight.shadow.camera.bottom = -modelRadius * 4;
   keyLight.shadow.camera.updateProjectionMatrix();
+  keyLight.shadow.normalBias = Math.max(modelRadius * 0.003, 0.01);
 
   fillLight.color.set(0xb8d4ff);
   fillLight.position.copy(fillPosition);
@@ -216,6 +222,7 @@ function updateLighting() {
   pointLight.intensity = intensity;
   pointLight.distance = modelRadius * 30;
   pointLight.decay = 1.0;
+  pointLight.shadow.normalBias = Math.max(modelRadius * 0.003, 0.01);
 
   pointLightMarker.position.copy(position);
   pointLightMarker.scale.setScalar(Math.max(modelRadius * 0.08, 0.08));
@@ -632,11 +639,29 @@ function applyLightModeDefaults() {
   updateLighting();
 }
 
+// 合并重复顶点并重新计算平滑法线。
+function prepareSmoothGeometry(node) {
+  if (node.userData.smoothGeometryPrepared) {
+    return;
+  }
+
+  const originalGeometry = node.geometry;
+  const mergedGeometry = mergeVertices(originalGeometry, 1e-5);
+  mergedGeometry.deleteAttribute("normal");
+  mergedGeometry.computeVertexNormals();
+  node.geometry = mergedGeometry;
+  node.userData.smoothGeometryPrepared = true;
+
+  if (originalGeometry !== mergedGeometry) {
+    originalGeometry.dispose();
+  }
+}
+
 // 设置当前模型材质。
 function assignMaterial(node) {
-  node.geometry.computeVertexNormals();
+  prepareSmoothGeometry(node);
   node.castShadow = true;
-  node.receiveShadow = true;
+  node.receiveShadow = false;
   if (renderMode === "heatmap" && !wireframe) {
     applyHeatmapColors(node.geometry, levels[currentIndex]);
   }
