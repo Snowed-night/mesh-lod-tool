@@ -25,6 +25,7 @@ const screenErrorText = document.querySelector("#screenErrorText");
 const geometryErrorText = document.querySelector("#geometryErrorText");
 const wireButton = document.querySelector("#wireButton");
 const resetButton = document.querySelector("#resetButton");
+const matteModeButton = document.querySelector("#matteModeButton");
 const pbrModeButton = document.querySelector("#pbrModeButton");
 const heatmapModeButton = document.querySelector("#heatmapModeButton");
 const heatmapMetricText = document.querySelector("#heatmapMetricText");
@@ -45,7 +46,7 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.setClearColor(0x111418, 1);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.05;
+renderer.toneMappingExposure = 0.78;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
@@ -65,11 +66,17 @@ controls.mouseButtons.MIDDLE = -1;
 const loader = new OBJLoader();
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
-const material = new THREE.MeshStandardMaterial({
-  color: 0xb6c1cc,
-  roughness: 0.48,
-  metalness: 0.08,
-  envMapIntensity: 0.75,
+const matteMaterial = new THREE.MeshLambertMaterial({
+  color: 0x9aa3aa,
+  emissive: 0x000000,
+  side: THREE.DoubleSide
+});
+
+const pbrMaterial = new THREE.MeshStandardMaterial({
+  color: 0x747c84,
+  roughness: 0.82,
+  metalness: 0.0,
+  envMapIntensity: 0.08,
   side: THREE.DoubleSide
 });
 
@@ -91,7 +98,7 @@ let levels = [];
 let currentObject = null;
 let currentIndex = 0;
 let wireframe = false;
-let renderMode = "pbr";
+let renderMode = "matte";
 let adaptiveMode = false;
 let objectCache = new Map();
 let loadCache = new Map();
@@ -111,20 +118,20 @@ let heatmapFrame = 0;
 
 // 设置预览场景光照。
 function setupLights() {
-  ambientLight = new THREE.HemisphereLight(0xf4f8ff, 0x252b31, 0.55);
+  ambientLight = new THREE.HemisphereLight(0xf4f8ff, 0x252b31, 0.18);
   scene.add(ambientLight);
 
-  keyLight = new THREE.DirectionalLight(0xffffff, 1.2);
+  keyLight = new THREE.DirectionalLight(0xffffff, 0.95);
   keyLight.castShadow = true;
   keyLight.shadow.mapSize.set(2048, 2048);
   scene.add(keyLight);
   scene.add(keyLight.target);
 
-  fillLight = new THREE.DirectionalLight(0xb8d4ff, 0.35);
+  fillLight = new THREE.DirectionalLight(0xb8d4ff, 0.16);
   scene.add(fillLight);
   scene.add(fillLight.target);
 
-  pointLight = new THREE.PointLight(0xffffff, 1.2, 0, 2);
+  pointLight = new THREE.PointLight(0xffffff, 1.2, 0, 1.4);
   pointLight.castShadow = true;
   pointLight.shadow.mapSize.set(1024, 1024);
   scene.add(pointLight);
@@ -147,6 +154,18 @@ function setupLights() {
   scene.add(groundPlane);
 
   updateLighting();
+}
+
+// 根据显示模式调整环境补光。
+function applyRenderLightProfile(mode) {
+  if (renderMode === "pbr") {
+    pbrMaterial.envMapIntensity = mode === "point" ? 0.035 : 0.08;
+    ambientLight.intensity = mode === "point" ? 0.006 : 0.10;
+    return;
+  }
+
+  pbrMaterial.envMapIntensity = 0.0;
+  ambientLight.intensity = mode === "point" ? 0.015 : 0.18;
 }
 
 // 根据界面参数更新光源位置和模式。
@@ -190,18 +209,18 @@ function updateLighting() {
   fillLight.color.set(0xb8d4ff);
   fillLight.position.copy(fillPosition);
   fillLight.target.position.copy(modelCenter);
-  fillLight.intensity = Math.max(0.15, intensity * 0.25);
+  fillLight.intensity = Math.max(0.05, intensity * 0.12);
 
   pointLight.color.copy(color);
   pointLight.position.copy(position);
   pointLight.intensity = intensity;
   pointLight.distance = modelRadius * 30;
-  pointLight.decay = 0.8;
+  pointLight.decay = 1.0;
 
   pointLightMarker.position.copy(position);
   pointLightMarker.scale.setScalar(Math.max(modelRadius * 0.08, 0.08));
   pointLightMarker.material.color.copy(color);
-  ambientLight.intensity = mode === "sun" ? 0.45 : 0.08;
+  applyRenderLightProfile(mode);
 }
 
 // 根据模型包围盒更新接触阴影地面。
@@ -475,14 +494,19 @@ function materialForCurrentLevel() {
   if (renderMode === "heatmap") {
     return heatmapMaterial;
   }
-  return material;
+  if (renderMode === "pbr") {
+    return pbrMaterial;
+  }
+  return matteMaterial;
 }
 
 // 更新渲染模式按钮。
 function updateRenderModeButtons() {
+  matteModeButton.classList.toggle("active", renderMode === "matte");
   pbrModeButton.classList.toggle("active", renderMode === "pbr");
   heatmapModeButton.classList.toggle("active", renderMode === "heatmap");
-  heatmapMetricText.textContent = renderMode === "heatmap" ? "蓝低 / 黄中 / 红高" : "结构敏感度 + 轮廓";
+  heatmapMetricText.textContent = renderMode === "heatmap" ? "蓝低 / 黄中 / 红高" : "未启用";
+  updateLighting();
 }
 
 // 更新自适应 LOD 指标文字。
@@ -1005,16 +1029,22 @@ wireButton.addEventListener("click", () => {
   refreshCachedMaterials();
 });
 
-pbrModeButton.addEventListener("click", () => {
-  renderMode = "pbr";
+function setRenderMode(nextMode) {
+  renderMode = nextMode;
   updateRenderModeButtons();
   refreshCachedMaterials();
+}
+
+matteModeButton.addEventListener("click", () => {
+  setRenderMode("matte");
+});
+
+pbrModeButton.addEventListener("click", () => {
+  setRenderMode("pbr");
 });
 
 heatmapModeButton.addEventListener("click", () => {
-  renderMode = "heatmap";
-  updateRenderModeButtons();
-  refreshCachedMaterials();
+  setRenderMode("heatmap");
 });
 
 resetButton.addEventListener("click", () => {

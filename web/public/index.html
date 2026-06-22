@@ -69,7 +69,8 @@
             <button id="resetButton" type="button">重置视角</button>
           </div>
           <div class="render-mode-row">
-            <button id="pbrModeButton" class="active" type="button">真实材质</button>
+            <button id="matteModeButton" class="active" type="button">无材质</button>
+            <button id="pbrModeButton" type="button">真实材质</button>
             <button id="heatmapModeButton" type="button">误差热力图</button>
           </div>
           <div class="metric-row">
@@ -93,7 +94,7 @@
             <label for="lightZ">Z</label>
             <input id="lightZ" type="range" min="-4" max="4" step="0.01" value="2.4" />
             <label for="lightIntensity">强度</label>
-            <input id="lightIntensity" type="range" min="0" max="30" step="0.1" value="8" />
+            <input id="lightIntensity" type="range" min="0" max="30" step="0.1" value="1.6" />
             <label for="lightColor">颜色</label>
             <input id="lightColor" type="color" value="#ffffff" />
           </div>
