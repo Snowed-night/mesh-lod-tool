@@ -220,9 +220,23 @@ report/
 学号+姓名+误差驱动的三维网格LOD简化与可视化系统.zip
 ```
 
-打包时建议包含 `src/`、`web/`、`third_party/meshoptimizer/`、`README.md`、`report/`、代表性 `result/web/tables/*.csv` 和必要截图。`result/web/models/` 体积较大，可以只保留 1 到 2 个代表模型，或在文档中说明可通过命令复现生成。
+打包时建议包含 `src/`、`web/`、`third_party/meshoptimizer/`、`README.md`、`report/`、代表性 `result/web/tables/*.csv` 和 `result/report_assets/composite/` 中的最终合成图。`result/web/models/` 体积较大，可以只保留 1 到 2 个代表模型，或在文档中说明可通过命令复现生成。
 
-## 下一步
+## 报告素材
 
-下一阶段建议录制 2 组对比素材：手动 LOD 由精到粗变化、自适应 LOD 随视角远近自动切换。报告重点突出“自实现 QEM 原理基线 + meshoptimizer 工程后端 + 屏幕空间误差自适应切换 + 误差热力图/PBR 展示”。
+最终报告合成图位于：
+
+```text
+result/report_assets/composite/
+```
+
+当前包含：
+
+- `fig01_indoor_plant_lod_grid.png`
+- `fig02_horse_lod_grid.png`
+- `fig03_girl_lod_grid.png`
+- `fig04_empire_children_lighting.png`
+- `fig05_girl_adaptive_lod.png`
+
+报告重点突出“自实现 QEM 原理基线 + meshoptimizer 工程后端 + 屏幕空间误差自适应切换 + 误差热力图/PBR 展示”。
 

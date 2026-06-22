@@ -20,10 +20,10 @@ composite/
 report/素材清单.md
 ```
 
-当前规划的最终合成图：
+当前最终合成图：
 
 - `composite/fig01_indoor_plant_lod_grid.png`
-- `composite/fig02_horse_lod_grid.png`
+- `composite/fig02_horse_lod_grid.png`，Horse 未截图 PBR，因此该图为 3 x 5
 - `composite/fig03_girl_lod_grid.png`
 - `composite/fig04_empire_children_lighting.png`
 - `composite/fig05_girl_adaptive_lod.png`

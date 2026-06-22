@@ -43,6 +43,7 @@ Web 前端
   Three.js 模型加载
   手动 / 自适应 LOD
   PBR 渲染
+  平滑法线和阴影修正
   点光源控制
   误差热力图
   统计表和曲线
@@ -57,6 +58,8 @@ Web 前端
 - `src/main.cpp`：提供命令行入口和批量 LOD 生成。
 - `web/server.js`：接收上传文件、转换 3MF、调用 C++ 工具、管理缓存。
 - `web/public/main.js`：实现 Three.js 预览、自适应 LOD、热力图和光照控制。
+
+Web 前端在加载 OBJ 后会合并重复顶点并重新计算平滑法线。法线是决定表面受光方向的向量，如果 OBJ 中相同位置的顶点被拆开，直接渲染会出现块状或波浪状明暗条纹。系统还关闭了模型本体接收自身阴影，只保留模型向地面投影，并通过 `normalBias` 减少阴影自相交。shadow acne 是阴影贴图精度不足时，模型表面错误遮挡自己形成的条纹。
 
 ## 3. 核心算法
 
@@ -144,7 +147,7 @@ result/web/tables/girl_118fd17336c9_stats.csv
 result/web/tables/empire_children_e259041b8b89_stats.csv
 ```
 
-正文对比图建议选 3 个代表模型：
+正文对比图选用 3 个代表模型：
 
 - Indoor Plant：薄片和复杂结构，适合展示热力图调参。
 - Horse：高面数动物模型，适合展示从高精度到低精度的连续变化。
@@ -152,17 +155,46 @@ result/web/tables/empire_children_e259041b8b89_stats.csv
 
 点光源效果单独使用 Empire Children 展示，不放入三模型 LOD 主对比图。
 
-可在报告中整理如下表格：
+实验统计如下：
 
-| 模型 | 原始三角面 | LOD 001 三角面 | 压缩率 | LOD 001 几何误差 | 总生成耗时 |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| TV Furniture | 30,440 | 416 | 98.6% | 33.9632 | 482 ms |
-| IndoorPotPlant | 45,840 | 578 | 98.7% | 1.0841 | 832 ms |
-| Horse | 190,272 | 1,902 | 99.0% | 0.328792 | 3,388 ms |
-| Girl | 332,940 | 3,306 | 99.0% | 0.773652 | 6,754 ms |
-| Empire Children | 1,331,674 | 13,317 | 99.0% | 0.414256 | 27,972 ms |
+| 模型 | 原始三角面 | LOD 004 三角面 | LOD 004 压缩率 | LOD 004 几何误差 | LOD 001 三角面 | 总生成耗时 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Indoor Plant | 45,840 | 1,832 | 96.0% | 0.046943 | 578 | 832 ms |
+| Horse | 190,272 | 7,610 | 96.0% | 0.114661 | 1,902 | 3,388 ms |
+| Girl | 332,940 | 13,306 | 96.0% | 0.304080 | 3,306 | 6,754 ms |
+| Empire Children | 1,331,674 | 53,255 | 96.0% | 0.116340 | 13,317 | 27,972 ms |
 
 说明：几何误差来自 meshoptimizer 返回的简化误差并转换到模型坐标空间。不同模型的坐标尺度不同，因此绝对误差不能直接跨模型比较，更适合在同一模型不同 LOD 之间比较。
+
+从表中可以看到，LOD 004 已经将三角面数量降低约 96%，LOD 001 进一步降低到约 1%。对于 Horse 和 Girl 这类曲面较多的模型，LOD 004 仍能保留主要轮廓；LOD 001 更适合远距离或演示低精度极限。Empire Children 原始三角面超过 133 万，仍能在 30 秒内生成完整多级 LOD，说明系统可以支撑较复杂的课程展示模型。
+
+### 4.1 多模型 LOD 可视化
+
+最终报告使用 3 个模型进行 LOD 可视化对比。每组横向展示 `LOD 100 / 075 / 050 / 025 / 004`，纵向展示不同渲染模式。
+
+![Indoor Plant LOD 对比](../result/report_assets/composite/fig01_indoor_plant_lod_grid.png)
+
+Indoor Plant 包含大量薄片结构，适合观察边界和细小结构在低精度 LOD 下的变化。线框模式能看到三角面逐级减少，无材质和真实材质模式能观察整体外观保持情况，热力图则突出叶片边缘等结构敏感区域。
+
+![Horse LOD 对比](../result/report_assets/composite/fig02_horse_lod_grid.png)
+
+Horse 模型用于展示动物类曲面模型的连续简化效果。该组截图未包含 PBR 模式，因此最终图使用线框、无材质和热力图三行。可以看到从 LOD 100 到 LOD 025，主体轮廓仍然较稳定；到 LOD 004 时，耳朵、鬃毛和腿部等局部细节明显减少，更适合远距离显示。
+
+![Girl LOD 对比](../result/report_assets/composite/fig03_girl_lod_grid.png)
+
+Girl 模型结构最复杂，包含头发、衣褶、鞋带和底座等细节。该模型适合展示高面数模型在不同渲染模式下的 LOD 效果，也能体现平滑法线和阴影修正后表面条纹被弱化。
+
+### 4.2 光照效果展示
+
+![Empire Children 点光源对比](../result/report_assets/composite/fig04_empire_children_lighting.png)
+
+点光源实验使用 Empire Children 模型，分别改变光源位置和颜色。该图用于证明系统不仅能展示几何简化结果，也支持基础光照调节，方便后续录制答辩视频。点光源和自然光分开演示，可以避免环境光过强时看不出局部光照变化。
+
+### 4.3 自适应 LOD 展示
+
+![Girl 自适应 LOD 对比](../result/report_assets/composite/fig05_girl_adaptive_lod.png)
+
+自适应 LOD 使用 Girl 模型，在不同屏幕误差阈值下从近景到远景截图。阈值越低，系统越倾向于保留高精度模型；阈值越高，系统越容易选择低精度模型。该实验说明本项目不是简单按固定比例切换 LOD，而是根据当前视角下的像素误差进行选择。
 
 ## 5. 运行方式
 
@@ -191,13 +223,13 @@ npm start
 http://localhost:5177
 ```
 
-## 6. 结果展示建议
+## 6. 结果展示素材
 
-- 图 1：Indoor Plant 的线框、无材质、真实材质、热力图 LOD 对比。
-- 图 2：Horse 的线框、无材质、真实材质、热力图 LOD 对比。
-- 图 3：Girl 的线框、无材质、真实材质、热力图 LOD 对比。
-- 图 4：Empire Children 的点光源位置、颜色和角度变化。
-- 图 5：Girl 在不同屏幕误差阈值下的自适应 LOD 切换。
+- 图 1：Indoor Plant 的线框、无材质、真实材质、热力图 LOD 对比，文件为 `result/report_assets/composite/fig01_indoor_plant_lod_grid.png`。
+- 图 2：Horse 的线框、无材质、热力图 LOD 对比，文件为 `result/report_assets/composite/fig02_horse_lod_grid.png`。
+- 图 3：Girl 的线框、无材质、真实材质、热力图 LOD 对比，文件为 `result/report_assets/composite/fig03_girl_lod_grid.png`。
+- 图 4：Empire Children 的点光源位置、颜色和角度变化，文件为 `result/report_assets/composite/fig04_empire_children_lighting.png`。
+- 图 5：Girl 在不同屏幕误差阈值下的自适应 LOD 切换，文件为 `result/report_assets/composite/fig05_girl_adaptive_lod.png`。
 - 表格：不同模型的顶点数、三角面数、压缩率、误差和耗时。
 
 详细素材编号见 [素材清单.md](素材清单.md)。
@@ -208,6 +240,8 @@ http://localhost:5177
 result/report_assets/raw/
 result/report_assets/composite/
 ```
+
+其中 `raw/` 作为本地原始素材备份，不进入 GitHub；`composite/` 中的 5 张合成图进入最终报告和 PPT。
 
 最终演示视频保存到 `素材/截图或者视频/final_demo/`。
 
