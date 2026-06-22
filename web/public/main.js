@@ -73,10 +73,10 @@ const matteMaterial = new THREE.MeshLambertMaterial({
 });
 
 const pbrMaterial = new THREE.MeshStandardMaterial({
-  color: 0x747c84,
-  roughness: 0.82,
+  color: 0x56616a,
+  roughness: 0.88,
   metalness: 0.0,
-  envMapIntensity: 0.08,
+  envMapIntensity: 0.045,
   side: THREE.DoubleSide
 });
 
@@ -159,8 +159,8 @@ function setupLights() {
 // 根据显示模式调整环境补光。
 function applyRenderLightProfile(mode) {
   if (renderMode === "pbr") {
-    pbrMaterial.envMapIntensity = mode === "point" ? 0.035 : 0.08;
-    ambientLight.intensity = mode === "point" ? 0.006 : 0.10;
+    pbrMaterial.envMapIntensity = mode === "point" ? 0.02 : 0.045;
+    ambientLight.intensity = mode === "point" ? 0.004 : 0.075;
     return;
   }
 

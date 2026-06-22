@@ -45,61 +45,7 @@
           </div>
         </div>
 
-        <div class="controls">
-          <div class="mode-row">
-            <button id="manualModeButton" class="active" type="button">手动 LOD</button>
-            <button id="adaptiveModeButton" type="button">自适应 LOD</button>
-          </div>
-          <label for="lodSlider">LOD 层级</label>
-          <input id="lodSlider" type="range" min="0" max="0" value="0" disabled />
-          <div class="adaptive-controls">
-            <label for="errorThreshold">屏幕误差阈值 <span id="errorThresholdValue">2.0 px</span></label>
-            <input id="errorThreshold" type="range" min="0.5" max="12" step="0.5" value="2" />
-            <div class="metric-row">
-              <span>估计屏幕误差</span>
-              <strong id="screenErrorText">-</strong>
-            </div>
-            <div class="metric-row">
-              <span>几何误差</span>
-              <strong id="geometryErrorText">-</strong>
-            </div>
-          </div>
-          <div class="button-row">
-            <button id="wireButton" type="button">线框</button>
-            <button id="resetButton" type="button">重置视角</button>
-          </div>
-          <div class="render-mode-row">
-            <button id="matteModeButton" class="active" type="button">无材质</button>
-            <button id="pbrModeButton" type="button">真实材质</button>
-            <button id="heatmapModeButton" type="button">误差热力图</button>
-          </div>
-          <div class="metric-row">
-            <span>热力图指标</span>
-            <strong id="heatmapMetricText">结构敏感度 + 轮廓</strong>
-          </div>
-          <div class="heatmap-controls">
-            <label for="heatmapIntensity">热力图强度 <span id="heatmapIntensityValue">0.65</span></label>
-            <input id="heatmapIntensity" type="range" min="0.2" max="1.4" step="0.05" value="0.65" />
-          </div>
-          <div class="light-controls">
-            <label for="lightMode">光源</label>
-            <select id="lightMode">
-              <option value="sun">自然光</option>
-              <option value="point">点光源</option>
-            </select>
-            <label for="lightX">X</label>
-            <input id="lightX" type="range" min="-4" max="4" step="0.01" value="-1.4" />
-            <label for="lightY">Y</label>
-            <input id="lightY" type="range" min="-4" max="4" step="0.01" value="2.2" />
-            <label for="lightZ">Z</label>
-            <input id="lightZ" type="range" min="-4" max="4" step="0.01" value="2.4" />
-            <label for="lightIntensity">强度</label>
-            <input id="lightIntensity" type="range" min="0" max="30" step="0.1" value="1.6" />
-            <label for="lightColor">颜色</label>
-            <input id="lightColor" type="color" value="#ffffff" />
-          </div>
-          <p class="hint">左键旋转，Ctrl + 左键拖拽平移，L + 左键放置点光源，滚轮缩放。</p>
-        </div>
+        <p class="hint">左键旋转，Ctrl + 左键拖拽平移，L + 左键放置点光源，滚轮缩放。</p>
       </section>
 
       <section class="viewer-panel">
@@ -107,26 +53,94 @@
       </section>
 
       <section class="stats-panel">
+        <div class="controls">
+          <div class="control-section">
+            <div class="section-title">LOD 控制</div>
+            <div class="mode-row">
+              <button id="manualModeButton" class="active" type="button">手动 LOD</button>
+              <button id="adaptiveModeButton" type="button">自适应 LOD</button>
+            </div>
+            <label for="lodSlider">LOD 层级</label>
+            <input id="lodSlider" type="range" min="0" max="0" value="0" disabled />
+            <div class="adaptive-controls">
+              <label for="errorThreshold">屏幕误差阈值 <span id="errorThresholdValue">2.0 px</span></label>
+              <input id="errorThreshold" type="range" min="0.5" max="12" step="0.5" value="2" />
+              <div class="metric-row">
+                <span>估计屏幕误差</span>
+                <strong id="screenErrorText">-</strong>
+              </div>
+              <div class="metric-row">
+                <span>几何误差</span>
+                <strong id="geometryErrorText">-</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="control-section">
+            <div class="section-title">显示模式</div>
+            <div class="button-row">
+              <button id="wireButton" type="button">线框</button>
+              <button id="resetButton" type="button">重置视角</button>
+            </div>
+            <div class="render-mode-row">
+              <button id="matteModeButton" class="active" type="button">无材质</button>
+              <button id="pbrModeButton" type="button">真实材质</button>
+              <button id="heatmapModeButton" type="button">热力图</button>
+            </div>
+            <div class="metric-row">
+              <span>热力图指标</span>
+              <strong id="heatmapMetricText">未启用</strong>
+            </div>
+            <div class="heatmap-controls">
+              <label for="heatmapIntensity">热力图强度 <span id="heatmapIntensityValue">0.65</span></label>
+              <input id="heatmapIntensity" type="range" min="0.2" max="1.4" step="0.05" value="0.65" />
+            </div>
+          </div>
+
+          <div class="control-section">
+            <div class="section-title">光源</div>
+            <div class="light-controls">
+              <label for="lightMode">类型</label>
+              <select id="lightMode">
+                <option value="sun">自然光</option>
+                <option value="point">点光源</option>
+              </select>
+              <label for="lightIntensity">强度</label>
+              <input id="lightIntensity" type="range" min="0" max="30" step="0.1" value="1.6" />
+              <label for="lightColor">颜色</label>
+              <input id="lightColor" type="color" value="#ffffff" />
+              <label for="lightX">X</label>
+              <input id="lightX" type="range" min="-4" max="4" step="0.01" value="-1.4" />
+              <label for="lightY">Y</label>
+              <input id="lightY" type="range" min="-4" max="4" step="0.01" value="2.2" />
+              <label for="lightZ">Z</label>
+              <input id="lightZ" type="range" min="-4" max="4" step="0.01" value="2.4" />
+            </div>
+          </div>
+        </div>
+
         <div class="quality-panel">
           <div class="quality-chart">
             <div class="chart-title">误差-复杂度曲线</div>
             <canvas id="qualityChart" width="560" height="150"></canvas>
           </div>
-          <table>
-            <thead>
-              <tr>
-                <th>LOD</th>
-                <th>比例</th>
-                <th>顶点</th>
-                <th>三角面</th>
-                <th>压缩率</th>
-                <th>几何误差</th>
-                <th>屏幕误差</th>
-                <th>耗时</th>
-              </tr>
-            </thead>
-            <tbody id="statsBody"></tbody>
-          </table>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>LOD</th>
+                  <th>比例</th>
+                  <th>顶点</th>
+                  <th>三角面</th>
+                  <th>压缩率</th>
+                  <th>几何误差</th>
+                  <th>屏幕误差</th>
+                  <th>耗时</th>
+                </tr>
+              </thead>
+              <tbody id="statsBody"></tbody>
+            </table>
+          </div>
         </div>
       </section>
     </main>
