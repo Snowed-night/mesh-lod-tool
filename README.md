@@ -212,6 +212,7 @@ report/
   02_technical_report.md    技术报告：代码、实验、结果
   03_reflection.md          未来工作展望与个人感想
   ppt_outline.md            答辩 PPT 结构
+  提交说明.md               大作业提交材料总入口
 ```
 
 建议最终压缩包命名：

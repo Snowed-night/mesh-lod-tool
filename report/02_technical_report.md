@@ -12,6 +12,8 @@
 https://github.com/Snowed-night/mesh-lod-tool
 ```
 
+代码提交说明：本项目代码（含必要注释）以 GitHub 仓库为准，仓库中包含 C++ 网格处理核心、Web 前后端、第三方 meshoptimizer 依赖接入、README 和报告素材说明。最终提交压缩包中可保留代码副本，也可在文档中直接标注该仓库地址作为代码入口。
+
 输入：
 
 - OBJ 模型：直接进入 LOD 生成流程。
