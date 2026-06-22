@@ -144,11 +144,13 @@ result/web/tables/girl_118fd17336c9_stats.csv
 result/web/tables/empire_children_e259041b8b89_stats.csv
 ```
 
-建议正文选 3 个代表模型：
+正文对比图建议选 3 个代表模型：
 
-- TV Furniture：物品模型，适合展示外观保持。
-- IndoorPotPlant：薄片和复杂结构，适合展示热力图调参。
-- Girl 或 Empire Children：复杂人物模型，适合展示高面数模型的 LOD 效果。
+- Indoor Plant：薄片和复杂结构，适合展示热力图调参。
+- Horse：高面数动物模型，适合展示从高精度到低精度的连续变化。
+- Girl：复杂人物模型，适合展示自适应 LOD 和局部结构变化。
+
+点光源效果单独使用 Empire Children 展示，不放入三模型 LOD 主对比图。
 
 可在报告中整理如下表格：
 
@@ -191,23 +193,23 @@ http://localhost:5177
 
 ## 6. 结果展示建议
 
-- 截图 1：Web 主界面。
-- 截图 2：同一模型不同 LOD 对比。
-- 截图 3：自适应 LOD 模式下的屏幕误差和当前 LOD。
-- 截图 4：误差热力图。
+- 图 1：Indoor Plant 的线框、无材质、真实材质、热力图 LOD 对比。
+- 图 2：Horse 的线框、无材质、真实材质、热力图 LOD 对比。
+- 图 3：Girl 的线框、无材质、真实材质、热力图 LOD 对比。
+- 图 4：Empire Children 的点光源位置、颜色和角度变化。
+- 图 5：Girl 在不同屏幕误差阈值下的自适应 LOD 切换。
 - 表格：不同模型的顶点数、三角面数、压缩率、误差和耗时。
 
 详细素材编号见 [素材清单.md](素材清单.md)。
 
-当前已经自动生成的报告截图：
+原先自动生成的 TV Furniture 截图已经删除，最终截图由手动截取后再合成。原始截图和合成图分别保存到：
 
 ```text
-result/report_assets/fig02_manual_lod_high.png
-result/report_assets/fig03_manual_lod_low.png
-result/report_assets/fig05_heatmap.png
+result/report_assets/raw/
+result/report_assets/composite/
 ```
 
-后续建议手动补充 Web 完整交互界面、自适应 LOD 缩放过程、点光源调节过程和人物/植物模型细节图。
+最终演示视频保存到 `素材/截图或者视频/final_demo/`。
 
 ## 7. 项目创新点
 
