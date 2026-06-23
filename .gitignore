@@ -28,6 +28,11 @@ result/report_assets/raw/
 素材/
 work/
 
+# Local-only notes and course report documents
+理解.md
+给我自己看的说明.md
+report/
+
 # Keep lightweight experiment tables available for reports
 !result/
 !result/web/
